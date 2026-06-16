@@ -2,6 +2,7 @@ package main
 
 import (
 	"ajo-tracker/db"
+	"ajo-tracker/routes"
 	"log"
 	"os"
 
@@ -18,6 +19,8 @@ func main() {
 	db.Connect()
 
 	r := gin.Default()
+
+	routes.SetupRoutes(r)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Ajo Tracker API is running!"})
