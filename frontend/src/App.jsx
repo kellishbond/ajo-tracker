@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -17,7 +18,7 @@ function AppRoutes() {
         path="/dashboard"
         element={
           <PrivateRoute>
-            <div className="p-8">Dashboard coming soon!</div>
+            <Dashboard />
           </PrivateRoute>
         }
       />
