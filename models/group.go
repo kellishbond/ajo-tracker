@@ -19,3 +19,13 @@ type GroupMember struct {
 	HasCollected bool   `json:"has_collected"`
 	JoinedAt     string `json:"joined_at"`
 }
+
+type Contribution struct {
+	ID      int     `json:"id"`
+	GroupID int     `json:"group_id"`
+	UserID  int     `json:"user_id"`
+	Round   int     `json:"round"`
+	Amount  float64 `json:"amount"`
+	Paid    bool    `json:"paid"`
+	PaidAt  *string `json:"paid_at"`
+}
