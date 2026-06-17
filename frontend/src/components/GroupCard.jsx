@@ -4,18 +4,29 @@ export default function GroupCard({ group }) {
   return (
     <Link
       to={`/groups/${group.id}`}
-      className="block bg-white rounded-lg shadow p-5 hover:shadow-md transition"
+      className="group relative block overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-xl transition-all hover:-translate-y-1 hover:border-emerald-500/50"
     >
-      <h3 className="text-lg font-semibold text-gray-800">{group.name}</h3>
-      <p className="text-gray-500 text-sm mt-1">{group.description}</p>
-
-      <div className="flex justify-between mt-4 text-sm text-gray-600">
-        <span>₦{group.contribution_amount.toLocaleString()}</span>
-        <span className="capitalize">{group.frequency}</span>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Active Circle</p>
+          <h3 className="mt-1 text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors">{group.name}</h3>
+        </div>
+        <span className="rounded-lg bg-slate-950/50 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          {group.frequency}
+        </span>
       </div>
 
-      <div className="mt-2 text-xs text-gray-400">
-        Max {group.max_members} members
+      <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-slate-400">{group.description}</p>
+
+      <div className="mt-8 flex items-center justify-between border-t border-slate-800/50 pt-6">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold uppercase text-slate-500">Contribution</span>
+          <span className="text-lg font-bold text-white">₦{group.contribution_amount.toLocaleString()}</span>
+        </div>
+        <div className="text-right">
+          <span className="text-[10px] font-bold uppercase text-slate-500">Capacity</span>
+          <p className="text-sm font-bold text-slate-300">{group.max_members} Members</p>
+        </div>
       </div>
     </Link>
   );

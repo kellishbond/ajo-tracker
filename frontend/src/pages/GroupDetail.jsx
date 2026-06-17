@@ -81,73 +81,95 @@ const handleAddMember = async (e) => {
   if (loading) return <p className="p-8 text-gray-500">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow px-6 py-4 flex items-center gap-4">
-        <Link to="/dashboard" className="text-green-700 text-sm">
-          ← Back
-        </Link>
-        <h1 className="text-lg font-bold">Group #{id} — Round {round}</h1>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <header className="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
+          <Link to="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-emerald-400 transition hover:text-emerald-300">
+            <span className="text-lg">←</span> Back
+          </Link>
+          <div className="text-center">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Circle Detail</p>
+            <h1 className="text-lg font-bold text-white">Round {round}</h1>
+          </div>
+          <div className="w-16" /> {/* Spacer */}
+        </div>
       </header>
 
-      <main className="max-w-2xl mx-auto p-6 space-y-6">
+      <main className="mx-auto max-w-3xl px-6 py-10 space-y-8">
         {message && (
-          <div className="bg-blue-50 text-blue-700 text-sm p-3 rounded">
+          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-sm font-medium text-emerald-300 backdrop-blur-md">
             {message}
           </div>
         )}
 
         {/* Payout Status Card */}
-        <div className="bg-white rounded-lg shadow p-5">
-          <h2 className="font-semibold mb-3">Payout Status</h2>
-          <p className="text-sm text-gray-600">
-            {payoutStatus?.paid_count} of {payoutStatus?.total_members} members paid
-          </p>
-          <p className="text-sm text-gray-600 mt-1">
-            Next to collect: <span className="font-medium">{payoutStatus?.recipient_name || "—"}</span>
-          </p>
+        <div className="overflow-hidden rounded-[2.5rem] border border-slate-800 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-xl font-bold text-white">Payout Distribution</h2>
+              <p className="mt-1 text-sm text-slate-400">Track current round collections</p>
+            </div>
+            <div className="text-right">
+              <span className="text-3xl font-bold text-emerald-400">{payoutStatus?.paid_count}</span>
+              <span className="text-slate-600"> / {payoutStatus?.total_members}</span>
+              <p className="text-[10px] font-bold uppercase tracking-tighter text-slate-500">Paid</p>
+            </div>
+          </div>
+
+          <div className="mb-8 rounded-3xl bg-slate-950/50 p-6 border border-slate-800/50">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Recipient of the Round</p>
+            <div className="mt-2 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30">
+                <span className="text-emerald-500 font-bold uppercase">{payoutStatus?.recipient_name?.charAt(0) || "?"}</span>
+              </div>
+              <p className="text-lg font-semibold text-white">{payoutStatus?.recipient_name || "Assigning..."}</p>
+            </div>
+          </div>
 
           <button
             onClick={handlePayout}
             disabled={!payoutStatus?.can_payout}
-            className={`mt-4 w-full py-2 rounded text-sm font-medium ${
+            className={`w-full py-4 rounded-2xl text-sm font-bold transition-all ${
               payoutStatus?.can_payout
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                ? "bg-gradient-to-br from-emerald-400 to-emerald-600 text-slate-950 shadow-lg shadow-emerald-500/20 hover:scale-[1.01]"
+                : "bg-slate-800 text-slate-500 cursor-not-allowed"
             }`}
           >
-            {payoutStatus?.can_payout ? "Process Payout" : "Waiting for all payments"}
+            {payoutStatus?.can_payout ? "Distribute Payout Funds" : "Awaiting All Member Payments"}
           </button>
         </div>
 
         {/* Members List */}
-        <div className="bg-white rounded-lg shadow p-5">
-          <h2 className="font-semibold mb-2">Members</h2>
-          {members.map((member) => (
-            <MemberRow
-              key={member.id}
-              member={member}
-              hasPaid={hasPaid(member.user_id)}
-              onMarkPaid={handleMarkPaid}
-              isCurrentRound={true}
-            />
-          ))}
+        <div className="rounded-[2.5rem] border border-slate-800 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-xl">
+          <h2 className="mb-6 text-xl font-bold text-white">Circle Participants</h2>
+          <div className="space-y-2">
+            {members.map((member) => (
+              <MemberRow
+                key={member.id}
+                member={member}
+                hasPaid={hasPaid(member.user_id)}
+                onMarkPaid={handleMarkPaid}
+                isCurrentRound={true}
+              />
+            ))}
+          </div>
 
-         <form onSubmit={handleAddMember} className="flex gap-2 mt-4">
-  <input
-    type="email"
-    placeholder="Member's email"
-    value={newMemberEmail}
-    onChange={(e) => setNewMemberEmail(e.target.value)}
-    className="flex-1 border p-2 rounded text-sm"
-    required
-  />
-  <button
-    type="submit"
-    className="bg-gray-800 text-white px-4 py-2 rounded text-sm"
-  >
-    Add
-  </button>
-</form>
+          <form onSubmit={handleAddMember} className="mt-8 flex gap-3">
+            <input
+              type="email"
+              placeholder="Enter member's email"
+              value={newMemberEmail}
+              onChange={(e) => setNewMemberEmail(e.target.value)}
+              className="flex-1 rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-emerald-500/50 focus:outline-none transition-colors"
+              required
+            />
+            <button
+              type="submit"
+              className="rounded-2xl bg-slate-800 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-slate-700 hover:text-emerald-400 active:scale-95"
+            >
+              Invite
+            </button>
+          </form>
         </div>
       </main>
     </div>
