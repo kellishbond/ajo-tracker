@@ -25,6 +25,8 @@ func SetupRoutes(r *gin.Engine) {
 			groups.GET("/:id/members", handlers.GetGroupMembers)
 			groups.POST("/:id/contributions", handlers.MarkContributionPaid)
 			groups.GET("/:id/contributions", handlers.GetContributions)
+			groups.GET("/:id/payout-status", handlers.GetPayoutStatus)
+			groups.POST("/:id/payout", handlers.ProcessPayout)
 		}
 	}
 }
