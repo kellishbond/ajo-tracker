@@ -18,7 +18,7 @@ export default function MemberRow({ member, hasPaid, onMarkPaid, isCurrentRound 
           </span>
         )}
 
-        {isCurrentRound && !member.has_collected && (
+      {isCurrentRound && (
   hasPaid ? (
     <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
       Paid

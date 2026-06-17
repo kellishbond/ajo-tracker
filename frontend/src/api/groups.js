@@ -3,8 +3,8 @@ import api from "./axios";
 export const getGroups = () => api.get("/groups/");
 export const createGroup = (data) => api.post("/groups/", data);
 export const getGroupMembers = (groupId) => api.get(`/groups/${groupId}/members`);
-export const addMember = (groupId, userId) =>
-  api.post(`/groups/${groupId}/members`, { user_id: userId });
+export const addMember = (groupId, email) =>
+  api.post(`/groups/${groupId}/members`, { email });
 export const getContributions = (groupId, round) =>
   api.get(`/groups/${groupId}/contributions?round=${round}`);
 export const markContributionPaid = (groupId, data) =>

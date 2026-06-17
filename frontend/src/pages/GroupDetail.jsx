@@ -17,7 +17,7 @@ export default function GroupDetail() {
   const [payoutStatus, setPayoutStatus] = useState(null);
   const [round, setRound] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [newMemberId, setNewMemberId] = useState("");
+  const [newMemberEmail, setNewMemberEmail] = useState("");
   const [message, setMessage] = useState("");
 
   const fetchAll = async () => {
@@ -67,17 +67,17 @@ export default function GroupDetail() {
     }
   };
 
-  const handleAddMember = async (e) => {
-    e.preventDefault();
-    try {
-      await addMember(id, parseInt(newMemberId));
-      setNewMemberId("");
-      fetchAll();
-    } catch (err) {
-      setMessage(err.response?.data?.error || "Failed to add member");
-    }
-  };
-
+const handleAddMember = async (e) => {
+  e.preventDefault();
+  try {
+    await addMember(id, newMemberEmail);
+    setNewMemberEmail("");
+    setMessage("Member added successfully!");
+    fetchAll();
+  } catch (err) {
+    setMessage(err.response?.data?.error || "Failed to add member");
+  }
+};
   if (loading) return <p className="p-8 text-gray-500">Loading...</p>;
 
   return (
@@ -132,22 +132,22 @@ export default function GroupDetail() {
             />
           ))}
 
-          <form onSubmit={handleAddMember} className="flex gap-2 mt-4">
-            <input
-              type="number"
-              placeholder="User ID to add"
-              value={newMemberId}
-              onChange={(e) => setNewMemberId(e.target.value)}
-              className="flex-1 border p-2 rounded text-sm"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-gray-800 text-white px-4 py-2 rounded text-sm"
-            >
-              Add
-            </button>
-          </form>
+         <form onSubmit={handleAddMember} className="flex gap-2 mt-4">
+  <input
+    type="email"
+    placeholder="Member's email"
+    value={newMemberEmail}
+    onChange={(e) => setNewMemberEmail(e.target.value)}
+    className="flex-1 border p-2 rounded text-sm"
+    required
+  />
+  <button
+    type="submit"
+    className="bg-gray-800 text-white px-4 py-2 rounded text-sm"
+  >
+    Add
+  </button>
+</form>
         </div>
       </main>
     </div>
