@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
+  getGroup,
   getGroupMembers,
   getContributions,
   markContributionPaid,
@@ -23,18 +24,16 @@ export default function GroupDetail() {
 
   const fetchAll = async () => {
     try {
-      const [membersRes, contribRes, statusRes] = await Promise.all([
+      const [groupRes, membersRes, contribRes, statusRes] = await Promise.all([
+        getGroup(id),
         getGroupMembers(id),
         getContributions(id, round),
         getPayoutStatus(id, round),
       ]);
+      setGroup(groupRes.data.group || {});
       setMembers(membersRes.data.members || []);
       setContributions(contribRes.data.contributions || []);
       setPayoutStatus(statusRes.data);
-
-      if (contribRes.data.contributions?.length > 0 && !group.contribution_amount) {
-        setGroup({ contribution_amount: contribRes.data.contributions[0].amount });
-      }
     } catch (err) {
       console.error(err);
     } finally {

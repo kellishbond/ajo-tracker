@@ -69,3 +69,22 @@ func GetGroups(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"groups": groups})
 }
+
+func GetGroup(c *gin.Context) {
+	groupID := c.Param("id")
+
+	var group models.Group
+	query := `SELECT id, name, description, contribution_amount, frequency, max_members, created_by, created_at
+			  FROM groups WHERE id = $1`
+
+	err := db.DB.QueryRow(query, groupID).Scan(
+		&group.ID, &group.Name, &group.Description, &group.ContributionAmount,
+		&group.Frequency, &group.MaxMembers, &group.CreatedBy, &group.CreatedAt,
+	)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Group not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"group": group})
+}

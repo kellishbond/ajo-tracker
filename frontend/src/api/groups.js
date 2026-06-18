@@ -1,6 +1,7 @@
 import api from "./axios";
 
 export const getGroups = () => api.get("/groups/");
+export const getGroup = (groupId) => api.get(`/groups/${groupId}`);
 export const createGroup = (data) => api.post("/groups/", data);
 export const getGroupMembers = (groupId) => api.get(`/groups/${groupId}/members`);
 export const addMember = (groupId, email) =>
