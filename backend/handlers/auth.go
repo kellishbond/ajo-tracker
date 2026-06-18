@@ -31,7 +31,7 @@ func Register(c *gin.Context) {
 	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`
 	err = db.DB.QueryRow(query, user.Name, user.Email, string(hashedPassword)).Scan(&user.ID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
