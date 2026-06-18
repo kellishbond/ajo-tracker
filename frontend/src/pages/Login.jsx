@@ -7,12 +7,14 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
 
     try {
       const res = await api.post("/auth/login", { email, password });
@@ -20,6 +22,8 @@ export default function Login() {
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -67,9 +71,10 @@ export default function Login() {
 
         <button
           type="submit"
-          className="mt-8 w-full rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 py-4 font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          disabled={isSubmitting}
+          className="mt-8 w-full rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 py-4 font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Secure Login
+          {isSubmitting ? "Logging in..." : "Secure Login"}
         </button>
 
         <p className="text-sm text-center mt-8 text-slate-500">

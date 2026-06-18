@@ -7,17 +7,21 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
 
     try {
       await api.post("/auth/register", { name, email, password });
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -74,9 +78,10 @@ export default function Register() {
 
         <button
           type="submit"
-          className="mt-8 w-full rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 py-4 font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          disabled={isSubmitting}
+          className="mt-8 w-full rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 py-4 font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign Up
+          {isSubmitting ? "Signing Up..." : "Sign Up"}
         </button>
 
         <p className="text-sm text-center mt-8 text-slate-500">

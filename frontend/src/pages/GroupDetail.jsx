@@ -13,6 +13,7 @@ import MemberRow from "../components/MemberRow";
 export default function GroupDetail() {
   const { id } = useParams();
   const [members, setMembers] = useState([]);
+  const [group, setGroup] = useState({});
   const [contributions, setContributions] = useState([]);
   const [payoutStatus, setPayoutStatus] = useState(null);
   const [round, setRound] = useState(1);
@@ -30,6 +31,10 @@ export default function GroupDetail() {
       setMembers(membersRes.data.members || []);
       setContributions(contribRes.data.contributions || []);
       setPayoutStatus(statusRes.data);
+
+      if (contribRes.data.contributions?.length > 0 && !group.contribution_amount) {
+        setGroup({ contribution_amount: contribRes.data.contributions[0].amount });
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -41,16 +46,22 @@ export default function GroupDetail() {
     fetchAll();
   }, [id, round]);
 
-  const hasPaid = (userId) =>
-    contributions.some((c) => c.user_id === userId && c.paid);
+  const total = payoutStatus?.total_members || 0;
+  const paid = payoutStatus?.paid_count || 0;
+  const calcRatio = total > 0 ? (paid * 100) / total : 0;
+  const progressPercentage = Math.floor(calcRatio);
+
+  const hasPaid = (userId) => contributions.some((c) => c.user_id === userId && c.paid);
 
   const handleMarkPaid = async (userId) => {
+    const amount = group?.contribution_amount || 0;
+    if (!amount) {
+      setMessage("Error: Contribution amount not found for this group.");
+      return;
+    }
+
     try {
-      await markContributionPaid(id, {
-        user_id: userId,
-        round,
-        amount: 5000, // TODO: pull from group's actual contribution_amount
-      });
+      await markContributionPaid(id, { user_id: userId, round, amount });
       fetchAll();
     } catch (err) {
       setMessage(err.response?.data?.error || "Failed to mark paid");
@@ -61,23 +72,24 @@ export default function GroupDetail() {
     try {
       await processPayout(id, round);
       setMessage("Payout processed! Moving to next round.");
-      setRound(round + 1);
+      setRound((prev) => prev + 1);
     } catch (err) {
       setMessage(err.response?.data?.error || "Payout failed");
     }
   };
 
-const handleAddMember = async (e) => {
-  e.preventDefault();
-  try {
-    await addMember(id, newMemberEmail);
-    setNewMemberEmail("");
-    setMessage("Member added successfully!");
-    fetchAll();
-  } catch (err) {
-    setMessage(err.response?.data?.error || "Failed to add member");
-  }
-};
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    try {
+      await addMember(id, newMemberEmail);
+      setNewMemberEmail("");
+      setMessage("Member added successfully!");
+      fetchAll();
+    } catch (err) {
+      setMessage(err.response?.data?.error || "Failed to add member");
+    }
+  };
+
   if (loading) return <p className="p-8 text-gray-500">Loading...</p>;
 
   return (
@@ -91,7 +103,7 @@ const handleAddMember = async (e) => {
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Circle Detail</p>
             <h1 className="text-lg font-bold text-white">Round {round}</h1>
           </div>
-          <div className="w-16" /> {/* Spacer */}
+          <div className="w-16" />
         </div>
       </header>
 
@@ -102,7 +114,6 @@ const handleAddMember = async (e) => {
           </div>
         )}
 
-        {/* Payout Status Card */}
         <div className="overflow-hidden rounded-[2.5rem] border border-slate-800 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-xl">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -110,11 +121,20 @@ const handleAddMember = async (e) => {
               <p className="mt-1 text-sm text-slate-400">Track current round collections</p>
             </div>
             <div className="text-right">
-              <span className="text-3xl font-bold text-emerald-400">{payoutStatus?.paid_count}</span>
-              <span className="text-slate-600"> / {payoutStatus?.total_members}</span>
-              <p className="text-[10px] font-bold uppercase tracking-tighter text-slate-500">Paid</p>
+              <span className="text-3xl font-bold text-emerald-400">{paid}</span>
+              <span className="text-slate-600"> of {total}</span>
+              <p className="text-[10px] font-bold uppercase tracking-tighter text-slate-500">Members Paid</p>
             </div>
           </div>
+
+          {payoutStatus?.total_members > 0 && (
+            <div className="mb-8 h-2.5 w-full rounded-full bg-slate-800">
+              <div
+                className="h-full rounded-full bg-emerald-500 transition-all duration-500 ease-out"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          )}
 
           <div className="mb-8 rounded-3xl bg-slate-950/50 p-6 border border-slate-800/50">
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Recipient of the Round</p>
@@ -139,7 +159,6 @@ const handleAddMember = async (e) => {
           </button>
         </div>
 
-        {/* Members List */}
         <div className="rounded-[2.5rem] border border-slate-800 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-xl">
           <h2 className="mb-6 text-xl font-bold text-white">Circle Participants</h2>
           <div className="space-y-2">

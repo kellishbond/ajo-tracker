@@ -10,6 +10,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
     max_members: "",
   });
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,16 +20,33 @@ export default function CreateGroupModal({ onClose, onCreated }) {
     e.preventDefault();
     setError("");
 
+    const amount = parseFloat(form.contribution_amount);
+    const members = parseInt(form.max_members, 10);
+
+    if (isNaN(amount) || amount <= 0) {
+      setError("Contribution amount must be greater than 0");
+      return;
+    }
+
+    if (isNaN(members) || members < 2) {
+      setError("Maximum members must be at least 2");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       await createGroup({
         ...form,
-        contribution_amount: parseFloat(form.contribution_amount),
-        max_members: parseInt(form.max_members, 10),
+        contribution_amount: amount,
+        max_members: members,
       });
       onCreated();
       onClose();
     } catch (err) {
       setError(err.response?.data?.error || "Failed to create group");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -105,9 +123,10 @@ export default function CreateGroupModal({ onClose, onCreated }) {
 
           <button
             type="submit"
-            className="mt-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 py-4 font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
+            disabled={isSubmitting}
+            className="mt-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 py-4 font-bold text-slate-950 shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Initialize Circle
+            {isSubmitting ? "Creating..." : "Initialize Circle"}
           </button>
         </form>
       </div>
